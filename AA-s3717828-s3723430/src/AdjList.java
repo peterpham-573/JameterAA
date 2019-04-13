@@ -16,6 +16,7 @@ public class AdjList extends AbstractAssocGraph
 	private Node[] nodes = new Node[100];
 	private Node[] temp;
 	private Edge[] edges = new Edge[100];
+	private Edge[] tempE;
 
     /**
 	 * Contructs empty graph.
@@ -54,50 +55,67 @@ public class AdjList extends AbstractAssocGraph
 
     public void addEdge(String srcLabel, String tarLabel, int weight) 
     {
-    	String srcCheck = "not";
-    	String tarCheck = "not";
-    	String check = "not";
+    	//String srcCheck = "not";
+    	//String tarCheck = "not";
+    	//String check = "not";
+    	
+    	boolean srcCheck = false;
+    	boolean tarCheck = false;
+    	boolean check = false;
     	
     	//check if vertex exists for source and destination
-    	for(int i = 0; i < nodeCount - 1; i++)
+    	for(int i = 0; i < nodeCount; i++)
     	{
     		if (srcLabel.equalsIgnoreCase(nodes[i].getVertex()))
     		{
-    			srcCheck = "found";
+    			srcCheck = true;
+    			
     		}
-    		
     		if (tarLabel.equalsIgnoreCase(nodes[i].getVertex()))
     		{
-    			tarCheck = "found";
+    			tarCheck = true;
     		}
     	}
-    	
         // check if edges exist -- same meaning that edge already exists!
-    	if (srcCheck.equalsIgnoreCase("found") || tarCheck.equalsIgnoreCase("found"))
+    	if (srcCheck == true && tarCheck == true)
     	{
-	    	for(int i = 0; i < edgeCount; i++)
+	    	for (int i = 0; i < edgeCount + 1; i++)
 	    	{
-	    		if(srcLabel.equalsIgnoreCase(edges[i].getSource()))
+	    		if (edges[i] == null)
 	    		{
-	    			if(tarLabel.equalsIgnoreCase(edges[i].getTarget()))
-	    			{
-	    				check = "same";
-	    			}
+	    			System.out.println("edge was null, check is true");
+	    			check = true;
+	    		}
+	    		else if(edges[i] != null)
+	    		{
+	    			System.out.println("edge was not null");
+		    		if(srcLabel.equalsIgnoreCase(edges[i].getSource()))
+		    		{
+		    			if(tarLabel.equalsIgnoreCase(edges[i].getTarget()))
+		    			{
+		    				check = false;
+		    	    		System.err.println("Error: edge already exists in the graph.");
+		    	    		break;
+		    			}
+		    			else
+		    			{
+		    				System.out.println("check is true");
+		    				check = true;
+		    			}
+		    		}
 	    		}
 	    	}
     	}
     	else
     	{
-    		System.err.println("Error: One of the vertices do not exist.");
+    		System.err.println("Error: one of the vertices do not exist.");
     	}
     	
+    	System.out.println("attempting to add edge");
     	//adding the edge now
-    	if (check.equalsIgnoreCase("same"))
+    	if (check == true)
     	{
-    		System.err.println("Error: edge already exists in the graph.");
-    	}
-    	else
-    	{
+    		System.out.println("adding edge passed");
     		Edge e = new Edge(srcLabel, tarLabel, weight);
     		edges[edgeCount] = e;
     		edgeCount++;
@@ -118,7 +136,7 @@ public class AdjList extends AbstractAssocGraph
     {
     	boolean check = false;
     	//find the edge
-        for (int i = 0; i < edgeCount - 1; i++)
+        for (int i = 0; i < edgeCount + 1; i++)
         {
         	if(srcLabel.equalsIgnoreCase(edges[i].getSource()))
         	{
@@ -198,7 +216,7 @@ public class AdjList extends AbstractAssocGraph
         // Implementing printing all vertices { PV } -- Order does not matter
     	for (int i = 0; i < nodeCount; i++)
     	{
-    		os.append(nodes[i] + " ");
+    		os.println(nodes[i].getVertex());
     	}
     	
     } // end of printVertices()
@@ -210,8 +228,8 @@ public class AdjList extends AbstractAssocGraph
     	
     	for (int i = 0; i < edgeCount; i++)
     	{
-    		os.append(edges[i].getSource() + " " + edges[i].getTarget() + " " + edges[i].getWeight() + "\n");
-    	}   	
+    		os.println(edges[i].getSource() + " " + edges[i].getTarget() + " " + edges[i].getWeight() + "\n");
+    	} 
     } // end of printEdges()
 
     //Created class of edge
