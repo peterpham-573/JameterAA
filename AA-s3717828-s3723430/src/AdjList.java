@@ -11,7 +11,6 @@ import java.util.*;
 public class AdjList extends AbstractAssocGraph
 {
 	private int nodeCount = 0;
-	private int tempCount;
 	private int edgeCount = 0;
 	private Node[] nodes = new Node[100];
 	private Node[] temp;
@@ -25,7 +24,6 @@ public class AdjList extends AbstractAssocGraph
     {
     	//empty    	
     } // end of AdjList()
-
 
     public void addVertex(String vertLabel) 
     {   	
@@ -55,10 +53,6 @@ public class AdjList extends AbstractAssocGraph
 
     public void addEdge(String srcLabel, String tarLabel, int weight) 
     {
-    	//String srcCheck = "not";
-    	//String tarCheck = "not";
-    	//String check = "not";
-    	
     	boolean srcCheck = false;
     	boolean tarCheck = false;
     	boolean check = false;
@@ -83,12 +77,11 @@ public class AdjList extends AbstractAssocGraph
 	    	{
 	    		if (edges[i] == null)
 	    		{
-	    			System.out.println("edge was null, check is true");
 	    			check = true;
+	    			break;
 	    		}
 	    		else if(edges[i] != null)
 	    		{
-	    			System.out.println("edge was not null");
 		    		if(srcLabel.equalsIgnoreCase(edges[i].getSource()))
 		    		{
 		    			if(tarLabel.equalsIgnoreCase(edges[i].getTarget()))
@@ -99,7 +92,6 @@ public class AdjList extends AbstractAssocGraph
 		    			}
 		    			else
 		    			{
-		    				System.out.println("check is true");
 		    				check = true;
 		    			}
 		    		}
@@ -110,8 +102,6 @@ public class AdjList extends AbstractAssocGraph
     	{
     		System.err.println("Error: one of the vertices do not exist.");
     	}
-    	
-    	System.out.println("attempting to add edge");
     	//adding the edge now
     	if (check == true)
     	{
@@ -122,15 +112,37 @@ public class AdjList extends AbstractAssocGraph
     	}
     } // end of addEdge()
 
-
     public int getEdgeWeight(String srcLabel, String tarLabel) 
     {
-		    // Implement me!
-
-		    // update return value
+    	int get = -1;
+    	boolean exists = false;
+    	
+    	for (int i = 0; i < edgeCount + 1; i++)
+    	{
+    		if (edges[i] != null)
+    		{
+    			if (srcLabel.equalsIgnoreCase(edges[i].getSource()))
+    			{
+    				if (tarLabel.equalsIgnoreCase(edges[i].getTarget()))
+    				{
+    					get = i;
+    					exists = true;
+    					break;
+    				}
+    			}
+    		}
+    		
+    	}
+    	
+    	if (exists == true)
+    	{
+    		return edges[get].getWeight();
+    	}
+    	else
+    	{
 		    return EDGE_NOT_EXIST;
+    	}
     } // end of existEdge()
-
 
     public void updateWeightEdge(String srcLabel, String tarLabel, int weight) 
     {
@@ -140,11 +152,15 @@ public class AdjList extends AbstractAssocGraph
         {
         	if(srcLabel.equalsIgnoreCase(edges[i].getSource()))
         	{
-            	if(tarLabel.equalsIgnoreCase(edges[i].getTarget()))
-            	{
-            		edges[i].setWeight(weight);
-            		check = true;
-            	}
+        		if (edges[i] != null)
+        		{
+	            	if(tarLabel.equalsIgnoreCase(edges[i].getTarget()))
+	            	{
+	            		edges[i].setWeight(weight);
+	            		check = true;
+	            		break;
+	            	}
+        		}
         	}
         }
         if (check == false)
@@ -153,9 +169,40 @@ public class AdjList extends AbstractAssocGraph
         }
     } // end of updateWeightEdge()
 
-
     public void removeVertex(String vertLabel) 
     {
+    	/*REMOVEING ALL EDGES RELATED TO VERTEX*/
+    	for (int i = 0; i < edgeCount + 1; i++)
+    	{
+    		if (edges[i] != null)
+    		{
+    			if (vertLabel.equalsIgnoreCase(edges[i].getSource()) && edges[i] != null)
+    			{
+    				edges[i] = null;
+    				edgeCount--;
+    			}
+    			if (vertLabel.equalsIgnoreCase(edges[i].getTarget()) && edges[i] != null)
+    			{
+    				edges[i] = null;
+    				edgeCount--;
+    			}
+    		}
+    	}
+    	
+      	tempE = new Edge[100];
+    	int tempECount = 0;
+    	for (int i = 0; i < edgeCount + 1; i++)
+    	{
+    		if (edges[i] != null)
+    		{
+    			tempE[tempECount] = edges[i];
+    			tempECount++;
+    		}
+    	}
+    	edges = new Edge[100];
+    	edges = tempE; 	
+    	
+    	/*REMOVING THE VERTEX*/
         for(int i = 0; i < nodeCount; i++)
         {
         	if(vertLabel.equalsIgnoreCase(nodes[i].getVertex()))
@@ -166,7 +213,7 @@ public class AdjList extends AbstractAssocGraph
     	
         //makes a new temporary list, adds all good nodes to temp list, then copy temp list back to node list
     	temp = new Node[100];
-    	tempCount = 0;
+    	int tempCount = 0;
     	for (int i = 0; i < nodeCount; i++)
     	{
     		if(nodes[i] != null)
@@ -180,33 +227,39 @@ public class AdjList extends AbstractAssocGraph
     	nodeCount--;
     } // end of removeVertex()
 
-
     public List<MyPair> inNearestNeighbours(int k, String vertLabel) 
     {
         List<MyPair> neighbours = new ArrayList<MyPair>();
 
-        // Implement me!
-        
-        
-        
-        
-        
-        
-        
-
+        // WHERE the vertex is the target label, meaning we find the src labels!
+        for (int i = 0; i < edgeCount + 1; i++)
+        {
+        	if (edges[i] != null)
+        	{
+        		if (vertLabel.equalsIgnoreCase(edges[i].getTarget()))
+        		{
+        			neighbours.add(new MyPair(edges[i].getSource(), edges[i].getWeight()));
+        		}
+        	}
+        }
         return neighbours;
     } // end of inNearestNeighbours()
-
 
     public List<MyPair> outNearestNeighbours(int k, String vertLabel) 
     {
         List<MyPair> neighbours = new ArrayList<MyPair>();
 
-        // Implement me!
-
-        
-        
-        
+        // WHERE the vertex is the source label, meaning we find the tar labels!
+        for (int i = 0; i < edgeCount + 1; i++)
+        {
+        	if (edges[i] != null)
+        	{
+        		if (vertLabel.equalsIgnoreCase(edges[i].getSource()))
+        		{
+        			neighbours.add(new MyPair(edges[i].getTarget(), edges[i].getWeight()));
+        		}
+        	}
+        }
         return neighbours;
     } // end of outNearestNeighbours()
 
@@ -216,9 +269,9 @@ public class AdjList extends AbstractAssocGraph
         // Implementing printing all vertices { PV } -- Order does not matter
     	for (int i = 0; i < nodeCount; i++)
     	{
-    		os.println(nodes[i].getVertex());
+    		os.printf("%1s", nodes[i].getVertex() + "  ");
     	}
-    	
+    	System.out.println();
     } // end of printVertices()
 
 
@@ -228,7 +281,7 @@ public class AdjList extends AbstractAssocGraph
     	
     	for (int i = 0; i < edgeCount; i++)
     	{
-    		os.println(edges[i].getSource() + " " + edges[i].getTarget() + " " + edges[i].getWeight() + "\n");
+    		os.println(edges[i].getSource() + " " + edges[i].getTarget() + " " + edges[i].getWeight());
     	} 
     } // end of printEdges()
 
