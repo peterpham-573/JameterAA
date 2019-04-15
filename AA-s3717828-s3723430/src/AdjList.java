@@ -40,13 +40,14 @@ public class AdjList extends AbstractAssocGraph
     	
     	if (check.equalsIgnoreCase("same"))
     	{
-    		System.err.println("Error: Vertex already exists.");
+    		System.err.println("Warning: Vertex already exists.");
     	}
     	else
     	{
     		Node addN = new Node(vertLabel);
     		nodes[nodeCount] = addN;
     		nodeCount++;
+    		System.out.println("Vertex added.");
     	}
     	
     } // end of addVertex()
@@ -87,7 +88,7 @@ public class AdjList extends AbstractAssocGraph
 		    			if(tarLabel.equalsIgnoreCase(edges[i].getTarget()))
 		    			{
 		    				check = false;
-		    	    		System.err.println("Error: edge already exists in the graph.");
+		    	    		System.err.println("Warning: edge already exists in the graph.");
 		    	    		break;
 		    			}
 		    			else
@@ -100,12 +101,12 @@ public class AdjList extends AbstractAssocGraph
     	}
     	else
     	{
-    		System.err.println("Error: one of the vertices do not exist.");
+    		System.err.println("Warning: one of the vertices do not exist.");
     	}
     	//adding the edge now
     	if (check == true)
     	{
-    		System.out.println("adding edge passed");
+    		System.out.println("Edge added.");
     		Edge e = new Edge(srcLabel, tarLabel, weight);
     		edges[edgeCount] = e;
     		edgeCount++;
@@ -165,12 +166,13 @@ public class AdjList extends AbstractAssocGraph
         }
         if (check == false)
         {
-        	System.err.println("Error: one of the vertices do not exist");
+        	System.err.println("Warning: one of the vertices do not exist");
         }
     } // end of updateWeightEdge()
 
     public void removeVertex(String vertLabel) 
     {
+    	boolean check = false;
     	/*REMOVEING ALL EDGES RELATED TO VERTEX*/
     	for (int i = 0; i < edgeCount + 1; i++)
     	{
@@ -181,7 +183,7 @@ public class AdjList extends AbstractAssocGraph
     				edges[i] = null;
     				edgeCount--;
     			}
-    			if (vertLabel.equalsIgnoreCase(edges[i].getTarget()) && edges[i] != null)
+    			else if (vertLabel.equalsIgnoreCase(edges[i].getTarget()) && edges[i] != null)
     			{
     				edges[i] = null;
     				edgeCount--;
@@ -208,59 +210,168 @@ public class AdjList extends AbstractAssocGraph
         	if(vertLabel.equalsIgnoreCase(nodes[i].getVertex()))
         	{
         		nodes[i] = null;
+        		check = true;
         	}
         }
     	
-        //makes a new temporary list, adds all good nodes to temp list, then copy temp list back to node list
-    	temp = new Node[100];
-    	int tempCount = 0;
-    	for (int i = 0; i < nodeCount; i++)
+        //makes a new temporary list and copies to new list
+    	if (check == false)
+        {
+           	System.err.println("Warning: Vertex does not exist in this list.");
+        }
+    	else
     	{
-    		if(nodes[i] != null)
-    		{
-    			temp[tempCount] = nodes[i];
-    			tempCount++;
-    		}
+    		temp = new Node[100];
+        	int tempCount = 0;
+        	for (int i = 0; i < nodeCount; i++)
+        	{
+        		if(nodes[i] != null)
+        		{
+        			temp[tempCount] = nodes[i];
+        			tempCount++;
+        		}
+        	}    		
+    		
+	    	nodes = new Node[100];
+	    	nodes = temp;
+	    	nodeCount--;
     	}
-    	nodes = new Node[100];
-    	nodes = temp;
-    	nodeCount--;
     } // end of removeVertex()
 
     public List<MyPair> inNearestNeighbours(int k, String vertLabel) 
     {
         List<MyPair> neighbours = new ArrayList<MyPair>();
+        Edge[] newTempE = new Edge[100];
+        int tempWeightCount = 0;
 
-        // WHERE the vertex is the target label, meaning we find the src labels!
-        for (int i = 0; i < edgeCount + 1; i++)
+        if (k == -1)
         {
-        	if (edges[i] != null)
+	        // WHERE the vertex is the target label, meaning we find the src labels!
+	        for (int i = 0; i < edgeCount + 1; i++)
+	        {
+	        	if (edges[i] != null)
+	        	{
+	        		if (vertLabel.equalsIgnoreCase(edges[i].getTarget()))
+	        		{
+	        			neighbours.add(new MyPair(edges[i].getSource(), edges[i].getWeight()));
+	        		}
+	        	}
+	        }
+        } //end of k = -1
+        //ORDERING the int
+        if (k > 0)
+        {
+        	boolean vertCheck = false;
+        	//Adds all edges to temp list
+        	for (int i = 0; i < edgeCount + 1; i++)
         	{
-        		if (vertLabel.equalsIgnoreCase(edges[i].getTarget()))
+        		if (edges[i] != null && edges[i].getTarget().equalsIgnoreCase(vertLabel))
         		{
-        			neighbours.add(new MyPair(edges[i].getSource(), edges[i].getWeight()));
+        			System.out.println("edges added");
+        			newTempE[i] = edges[i];
+        			System.out.println(newTempE[i].getSource());
+        			tempWeightCount++;
+        			vertCheck = true;
         		}
         	}
-        }
+        	if (vertCheck == false)
+        	{
+        		System.err.println("Warning: vertex does not exist.");
+        	}
+	        	for (int i = 0; i < tempWeightCount; i++) 
+	        	{
+	        		System.out.println(i + " " + tempWeightCount);
+	                for (int j = 0; j < tempWeightCount - 1; j++) 
+	                {
+	                	System.out.println(j + " " + tempWeightCount);
+	                    // check if we need to swap
+	                	System.out.println("iteration " + j + " " + newTempE[j].getWeight() + "<" + newTempE[j+1].getWeight());
+	                    if (newTempE[j].getWeight() < newTempE[j+1].getWeight() && newTempE[j] != null && newTempE[j+1] != null)
+	                    {
+	                        Edge temporary = newTempE[j+1];
+	                        newTempE[j+1] = newTempE[j];
+	                        newTempE[j] = temporary;
+	                    }
+	                }
+	            }
+	        	for (int i = 0; i < k; i++)
+	        	{
+	        		if (newTempE[i] != null)
+	        		{
+	        			neighbours.add(new MyPair(newTempE[i].getSource(), newTempE[i].getWeight()));
+	        		}
+	        	}
+        } // end of k > 0
+        newTempE = null;
         return neighbours;
     } // end of inNearestNeighbours()
 
     public List<MyPair> outNearestNeighbours(int k, String vertLabel) 
     {
         List<MyPair> neighbours = new ArrayList<MyPair>();
+        Edge[] newTempEd = new Edge[100];
+        int tempWeightCount = 0;
 
-        // WHERE the vertex is the source label, meaning we find the tar labels!
-        for (int i = 0; i < edgeCount + 1; i++)
+        if (k == -1)
         {
-        	if (edges[i] != null)
+	        // WHERE the vertex is the source label, meaning we find the tar labels!
+	        for (int i = 0; i < edgeCount + 1; i++)
+	        {
+	        	if (edges[i] != null)
+	        	{
+	        		if (vertLabel.equalsIgnoreCase(edges[i].getSource()))
+	        		{
+	        			neighbours.add(new MyPair(edges[i].getTarget(), edges[i].getWeight()));
+	        		}
+	        	}
+	        }
+        } //end of k = -1
+        //ORDERING the int
+        if (k > 0)
+        {
+        	boolean vertCheck = false;
+        	//Adds all edges to temp list
+        	for (int i = 0; i < edgeCount + 1; i++)
         	{
-        		if (vertLabel.equalsIgnoreCase(edges[i].getSource()))
+        		if (edges[i] != null && edges[i].getSource().equalsIgnoreCase(vertLabel))
         		{
-        			neighbours.add(new MyPair(edges[i].getTarget(), edges[i].getWeight()));
+        			System.out.println("edges added");
+        			newTempEd[i] = edges[i];
+        			System.out.println(newTempEd[i].getSource());
+        			tempWeightCount++;
+        			vertCheck = true;
         		}
         	}
-        }
-        return neighbours;
+        	if (vertCheck == false)
+        	{
+        		System.err.println("Warning: vertex does not exist.");
+        	}
+	        	for (int i = 0; i < tempWeightCount; i++) 
+	        	{
+	        		System.out.println(i + " " + tempWeightCount);
+	                for (int j = 0; j < tempWeightCount - 1; j++) 
+	                {
+	                	System.out.println(j + " " + tempWeightCount);
+	                    // check if we need to swap
+	                	System.out.println("iteration " + j + " " + newTempEd[j].getWeight() + "<" + newTempEd[j+1].getWeight());
+	                    if (newTempEd[j].getWeight() < newTempEd[j+1].getWeight() && newTempEd[j] != null && newTempEd[j+1] != null)
+	                    {
+	                        Edge temporary = newTempEd[j+1];
+	                        newTempEd[j+1] = newTempEd[j];
+	                        newTempEd[j] = temporary;
+	                    }
+	                }
+	            }
+	        	for (int i = 0; i < k; i++)
+	        	{
+	        		if (newTempEd[i] != null)
+	        		{
+	        			neighbours.add(new MyPair(newTempEd[i].getTarget(), newTempEd[i].getWeight()));
+	        		}
+	        	}
+        } // end of k > 0
+        	newTempEd = null;
+	        return neighbours;
     } // end of outNearestNeighbours()
 
 
