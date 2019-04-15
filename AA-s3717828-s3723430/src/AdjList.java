@@ -183,8 +183,8 @@ public class AdjList extends AbstractAssocGraph
             		}
             	}
             	edges = new Edge[100];
+            	edgeCount = tempECount;
             	edges = tempE; 	
-            	
         	}
         }
         else if (check == false)
@@ -196,7 +196,7 @@ public class AdjList extends AbstractAssocGraph
     public void removeVertex(String vertLabel) 
     {
     	boolean check = false;
-    	/*REMOVEING ALL EDGES RELATED TO VERTEX*/
+    	/*REMOVEING ALL E	DGES RELATED TO VERTEX*/
     	for (int i = 0; i < edgeCount + 1; i++)
     	{
     		if (edges[i] != null)
@@ -204,18 +204,17 @@ public class AdjList extends AbstractAssocGraph
     			if (vertLabel.equalsIgnoreCase(edges[i].getSource()) && edges[i] != null)
     			{
     				edges[i] = null;
-    				edgeCount--;
     			}
     			else if (vertLabel.equalsIgnoreCase(edges[i].getTarget()) && edges[i] != null)
     			{
     				edges[i] = null;
-    				edgeCount--;
     			}
     		}
     	}
     	
       	tempE = new Edge[100];
     	int tempECount = 0;
+    	
     	for (int i = 0; i < edgeCount + 1; i++)
     	{
     		if (edges[i] != null)
@@ -225,8 +224,8 @@ public class AdjList extends AbstractAssocGraph
     		}
     	}
     	edges = new Edge[100];
+    	edgeCount = tempECount;
     	edges = tempE; 	
-    	
     	/*REMOVING THE VERTEX*/
         for(int i = 0; i < nodeCount; i++)
         {
