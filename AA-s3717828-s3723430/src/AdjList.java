@@ -147,6 +147,7 @@ public class AdjList extends AbstractAssocGraph
 
     public void updateWeightEdge(String srcLabel, String tarLabel, int weight) 
     {
+    	int deleteCheck = 1;
     	boolean check = false;
     	//find the edge
         for (int i = 0; i < edgeCount + 1; i++)
@@ -158,13 +159,35 @@ public class AdjList extends AbstractAssocGraph
 	            	if(tarLabel.equalsIgnoreCase(edges[i].getTarget()))
 	            	{
 	            		edges[i].setWeight(weight);
+	            		deleteCheck = i;
 	            		check = true;
 	            		break;
 	            	}
         		}
         	}
         }
-        if (check == false)
+        if (check == true)
+        {
+        	if (edges[deleteCheck].getWeight() <= 0)
+        	{
+        		edges[deleteCheck] = null;
+        		
+              	tempE = new Edge[100];
+            	int tempECount = 0;
+            	for (int i = 0; i < edgeCount + 1; i++)
+            	{
+            		if (edges[i] != null)
+            		{
+            			tempE[tempECount] = edges[i];
+            			tempECount++;
+            		}
+            	}
+            	edges = new Edge[100];
+            	edges = tempE; 	
+            	
+        	}
+        }
+        else if (check == false)
         {
         	System.err.println("Warning: one of the vertices do not exist");
         }
