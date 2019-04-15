@@ -278,13 +278,19 @@ public class AdjList extends AbstractAssocGraph
                     }
                 }
             }
-        	
-        	for (int i = 0; i < k; i++)
+        	if (k <= tempWeightCount)
         	{
-        		if (tempList.get(i) != null)
-        		{
-        			neighbours.add(tempList.get(i));
-        		}
+	        	for (int i = 0; i + 1 <= k; i++)
+	        	{
+	        		if (tempList.get(i) != null)
+	        		{
+	        			neighbours.add(tempList.get(i));
+	        		}
+	        	}
+        	}
+        	else
+        	{
+        		System.err.println("Warning: int k is more than amount of neighbours.");
         	}
         } //end of k > 0 condition
         return neighbours;
@@ -331,13 +337,19 @@ public class AdjList extends AbstractAssocGraph
                 }
             }
         	
-        	for (int i = 0; i < k; i++)
+        	if (k <= tempWeightCount)
         	{
-        		if (tempList.get(i) != null)
-        		{
-        			neighbours.add(tempList.get(i));
-        		}
-        		
+	        	for (int i = 0; i + 1 <= k; i++)
+	        	{
+	        		if (tempList.get(i) != null)
+	        		{
+	        			neighbours.add(tempList.get(i));
+	        		}
+	        	}
+        	}
+        	else
+        	{
+        		System.err.println("Warning: int k is more than amount of neighbours.");
         	}
         } //end of k > 0 condition
         return neighbours;
