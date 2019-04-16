@@ -1,6 +1,5 @@
 import java.io.*;
 import java.util.*;
-import com.sun.javafx.geom.Edge;
 
 /**
  * Incident matrix implementation for the AssociationGraph interface.
@@ -62,6 +61,8 @@ public class IncidenceMatrix extends AbstractAssocGraph {
 			{
 				edgeK.put(addingEdge, numOfEdges);
 				numOfEdges++;
+				
+				matrix = new int[numOfVertex][numOfEdges];
 
 				matrix[vertexK.get(srcLabel)][edgeK.get(addingEdge)] = weight;
 				matrix[vertexK.get(tarLabel)][edgeK.get(addingEdge)] = -weight;
@@ -366,7 +367,7 @@ public class IncidenceMatrix extends AbstractAssocGraph {
 		for(Map.Entry<String, Integer> vert: vertexK.entrySet())
 		{
 			String vtx = vert.getKey();
-			os.printf("%1s", vtx);
+			os.printf("%1s", vtx + " ");
 		}
 		os.println();
 	} // end of printVertices()
