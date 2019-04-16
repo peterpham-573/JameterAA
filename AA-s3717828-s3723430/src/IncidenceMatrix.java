@@ -300,6 +300,7 @@ public class IncidenceMatrix extends AbstractAssocGraph {
 			/*	AIM: to get the target labels
 			 * get the substrings
 			 * if target = a, we get the source
+			 * hehe xd
 			 */
 
 			for(Map.Entry<String, Integer> e: edgeK.entrySet())
