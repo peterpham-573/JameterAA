@@ -62,17 +62,16 @@ public class IncidenceMatrix extends AbstractAssocGraph {
 				edgeK.put(addingEdge, numOfEdges);
 				numOfEdges++;
 
-					int[][] temp = new int[numOfVertex][numOfEdges];
+				int[][] temp = new int[numOfVertex][numOfEdges];
 
-					for(int i = 0; i < numOfVertex; i++) 
+				for(int i = 0; i < matrix.length; i++) 
+				{
+					for(int j = 0; j < matrix[i].length; j++) 
 					{
-						for(int j = 0; j < numOfEdges; j++) 
-						{
-							
-							temp[i][j]= matrix[i][j];
-						}
+						temp[i][j] = matrix[i][j];							
 					}
-					matrix = temp;
+				}
+				matrix = temp;
 
 
 				matrix[vertexK.get(srcLabel)][edgeK.get(addingEdge)] = weight;
@@ -153,6 +152,7 @@ public class IncidenceMatrix extends AbstractAssocGraph {
 
 	public void removeVertex(String vertLabel) 
 	{
+
 		/*
 		 *  1 -- REPAINT THE MATRIX FROM THE OLD MATRIX!
 		 *  2 -- REMOVE EDGES RELATED TO VERTEX FIRST FROM THE EDGE MAP!,
@@ -160,20 +160,42 @@ public class IncidenceMatrix extends AbstractAssocGraph {
 		 */
 
 		/* Repaint the array */
+		int edges2rv = 0;
+		
 		for(Map.Entry<String, Integer> e: edgeK.entrySet())
 		{
 			String edger = e.getKey();
 			String pointA = edger.substring(0, 1);
 			String pointB = edger.substring(1, 2);
 
-			if(!pointA.equalsIgnoreCase(vertLabel) || !pointB.equalsIgnoreCase(vertLabel))
+			if(pointA.equalsIgnoreCase(vertLabel) || pointB.equalsIgnoreCase(vertLabel))
 			{
-				matrix[vertexK.get(pointA)][edgeK.get(edger)] = 0;
+				edges2rv++;
+			}
+		}
+		
+		int[][] temp = new int[numOfVertex - 1][numOfEdges - edges2rv];
+
+		
+		for(int i = 0; i < matrix.length; i++) 
+		{
+			for(int j = 0; j < matrix[i].length; j++) 
+			{
+				if(pointA.equalsIgnoreCase(vertLabel) || pointB.equalsIgnoreCase(vertLabel)) 
+				{
+				}
 			}
 		}
 
-		/* creating a string array */
-		String[] arry = new String[numOfEdges];
+//				for(int i=0; i < numOfVertex; i++) 
+//				{
+//					matrix[i][edgeK.get(edger)] = 99;
+//					matrix[vertexK.get(vertLabel)][i] = 99;
+//				}
+	
+		
+			/* creating a string array */
+			String[] arry = new String[numOfEdges];
 		int count = 0;
 		/* 2 -- REMOVING THE EDGES FROM THE MAP! */
 		for(Map.Entry<String, Integer> e: edgeK.entrySet())
@@ -189,25 +211,19 @@ public class IncidenceMatrix extends AbstractAssocGraph {
 			}
 		}
 
+
+
 		for(int i = 0; i < count; i++)
 		{
 			if(arry[i] != null)
 			{
 				edgeK.remove(arry[i]);
-				/*
-				 * reset numOfEdges
-				 * create temporary Map for new order of edges.
-				 * add back remaining edges from edgeK but to their new number using numOfEdges.
-				 * make edgeK = temporary map
-				 */
 			}
 		}
-		numOfEdges = 0;
-		for (Map.Entry<String, Integer> e: edgeK.entrySet())
-		{
-			e.setValue(numOfEdges);
-			numOfEdges++;
-		}
+		vertexK.remove(vertLabel);
+
+
+
 		/* 2 -- REMOVING THE VERTEX FROM THE MAP! */
 		/*
 		 * reset numOfVertex
@@ -216,7 +232,8 @@ public class IncidenceMatrix extends AbstractAssocGraph {
 		 * make vertexK = temporary map
 		 */
 		vertexK.remove(vertLabel);
-		numOfVertex = 0;
+
+
 		for (Map.Entry<String, Integer> e: vertexK.entrySet())
 		{
 			e.setValue(numOfVertex);
@@ -225,7 +242,7 @@ public class IncidenceMatrix extends AbstractAssocGraph {
 
 	} // end of removeVertex()
 
-	public List<MyPair> inNearestNeighbours(int k, String vertLabel) 
+	public List<MyPair> outNearestNeighbours(int k, String vertLabel) 
 	{
 		List<MyPair> neighbours = new ArrayList<MyPair>();
 		List<MyPair> temp = new ArrayList<MyPair>();
@@ -296,7 +313,7 @@ public class IncidenceMatrix extends AbstractAssocGraph {
 		return neighbours;
 	} // end of inNearestNeighbours()
 
-	public List<MyPair> outNearestNeighbours(int k, String vertLabel) {
+	public List<MyPair> inNearestNeighbours(int k, String vertLabel) {
 		List<MyPair> neighbours = new ArrayList<MyPair>();
 		List<MyPair> temp = new ArrayList<MyPair>();
 		int count = 0;
@@ -374,6 +391,16 @@ public class IncidenceMatrix extends AbstractAssocGraph {
 			os.printf("%1s", vtx + " ");
 		}
 		os.println();
+
+
+		for (int i = 0; i < matrix.length; i++)
+		{
+			for (int j = 0; j < matrix[i].length; j++)
+			{
+				System.out.print(matrix[i][j] + "  ");
+			}
+			System.out.println();
+		}
 	} // end of printVertices()
 
 	public void printEdges(PrintWriter os) 
