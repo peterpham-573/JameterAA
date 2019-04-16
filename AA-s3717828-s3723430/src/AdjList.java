@@ -273,7 +273,7 @@ public class AdjList extends AbstractAssocGraph
         	{
         		if (edges[i] != null && edges[i].getTarget().equalsIgnoreCase(vertLabel))
         		{
-        			neighbours.add(new MyPair(vertLabel, edges[i].getWeight()));
+        			neighbours.add(new MyPair(edges[i].getSource(), edges[i].getWeight()));
         		}
         	}
         }
@@ -283,7 +283,7 @@ public class AdjList extends AbstractAssocGraph
         	{
         		if (edges[i] != null && edges[i].getTarget().equalsIgnoreCase(vertLabel))
         		{
-        			tempList.add(new MyPair(vertLabel, edges[i].getWeight()));
+        			tempList.add(new MyPair(edges[i].getSource(), edges[i].getWeight()));
         			tempWeightCount++;
         		}
         	}
@@ -331,7 +331,7 @@ public class AdjList extends AbstractAssocGraph
         	{
         		if (edges[i] != null && edges[i].getSource().equalsIgnoreCase(vertLabel))
         		{
-        			neighbours.add(new MyPair(vertLabel, edges[i].getWeight()));
+        			neighbours.add(new MyPair(edges[i].getTarget(), edges[i].getWeight()));
         		}
         	}
         }
@@ -341,7 +341,7 @@ public class AdjList extends AbstractAssocGraph
         	{
         		if (edges[i] != null && edges[i].getSource().equalsIgnoreCase(vertLabel))
         		{
-        			tempList.add(new MyPair(vertLabel, edges[i].getWeight()));
+        			tempList.add(new MyPair(edges[i].getTarget(), edges[i].getWeight()));
         			tempWeightCount++;
         		}
         	}
