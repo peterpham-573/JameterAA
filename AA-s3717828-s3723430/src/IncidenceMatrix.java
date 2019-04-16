@@ -161,7 +161,11 @@ public class IncidenceMatrix extends AbstractAssocGraph {
 
 		/* Repaint the array */
 		int edges2rv = 0;
-		
+		int indexC[] = new int[edges2rv+1];
+		int indexR = vertexK.get(vertLabel); 	
+		int cRow;
+		int cCol;
+
 		for(Map.Entry<String, Integer> e: edgeK.entrySet())
 		{
 			String edger = e.getKey();
@@ -170,32 +174,53 @@ public class IncidenceMatrix extends AbstractAssocGraph {
 
 			if(pointA.equalsIgnoreCase(vertLabel) || pointB.equalsIgnoreCase(vertLabel))
 			{
+				matrix[vertexK.get(pointA)][edgeK.get(edger)] = 0;
+				indexC[edges2rv] = edgeK.get(edger);
 				edges2rv++;
+				indexC = Arrays.copyOf(indexC, edges2rv+1);
 			}
 		}
-		
-		int[][] temp = new int[numOfVertex - 1][numOfEdges - edges2rv];
 
-		
+		cRow = numOfVertex - 1;
+		cCol = numOfEdges - edges2rv;
+
+		int[][] temp = new int[cRow][cCol];
+
+		int newRow = 0;
+		int newCol = 0;
 		for(int i = 0; i < matrix.length; i++) 
 		{
-			for(int j = 0; j < matrix[i].length; j++) 
-			{
-				if(pointA.equalsIgnoreCase(vertLabel) || pointB.equalsIgnoreCase(vertLabel)) 
+			System.out.println("IndexR: " + indexR);
+			if(i != indexR) 
+			{					
+				for(int j = 0; j < matrix[i].length; j++) 
 				{
+					boolean notWnted = false;
+
+					for(int e = 0; e <= indexC.length-1; e++) 
+					{	
+						if(j == indexC[e]) {
+							notWnted = true;
+							break;
+						}
+					}
+
+					if(notWnted == false) 
+					{
+						System.out.printf("temp[%s][%s] = matrix[%s][%s] = %s\n", newRow % cRow,newCol % cCol,i,j,matrix[i][j]);
+						temp[newRow % cRow][newCol % cCol] = matrix[i][j];
+						newCol++;
+					}
+					
 				}
+				newRow++;
 			}
 		}
 
-//				for(int i=0; i < numOfVertex; i++) 
-//				{
-//					matrix[i][edgeK.get(edger)] = 99;
-//					matrix[vertexK.get(vertLabel)][i] = 99;
-//				}
-	
-		
-			/* creating a string array */
-			String[] arry = new String[numOfEdges];
+		matrix = temp;
+
+		/* creating a string array */
+		String[] arry = new String[numOfEdges];
 		int count = 0;
 		/* 2 -- REMOVING THE EDGES FROM THE MAP! */
 		for(Map.Entry<String, Integer> e: edgeK.entrySet())
@@ -220,8 +245,14 @@ public class IncidenceMatrix extends AbstractAssocGraph {
 				edgeK.remove(arry[i]);
 			}
 		}
-		vertexK.remove(vertLabel);
-
+		
+		numOfEdges = 0;
+		
+		for (Map.Entry<String, Integer> e: edgeK.entrySet())
+		{
+			e.setValue(numOfEdges);
+			numOfEdges++;
+		}
 
 
 		/* 2 -- REMOVING THE VERTEX FROM THE MAP! */
@@ -231,9 +262,10 @@ public class IncidenceMatrix extends AbstractAssocGraph {
 		 * add back remaining edges from vertexK to their new number using numOfVertex
 		 * make vertexK = temporary map
 		 */
+
 		vertexK.remove(vertLabel);
-
-
+		numOfVertex = 0;
+		
 		for (Map.Entry<String, Integer> e: vertexK.entrySet())
 		{
 			e.setValue(numOfVertex);
@@ -392,6 +424,12 @@ public class IncidenceMatrix extends AbstractAssocGraph {
 		}
 		os.println();
 
+		for(Map.Entry<String, Integer> edges: edgeK.entrySet()) {
+
+			String edg = edges.getKey();
+			os.printf("%1s", edg + " ");
+		}
+		os.println();
 
 		for (int i = 0; i < matrix.length; i++)
 		{
