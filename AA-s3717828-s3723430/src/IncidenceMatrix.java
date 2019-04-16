@@ -25,10 +25,10 @@ public class IncidenceMatrix extends AbstractAssocGraph {
 	} // end of IncidentMatrix()
 
 	public void addVertex(String vertLabel) {
-		
+
 		vertexK.put(vertLabel, numOfVertex);
 		numOfVertex++;
-	
+
 	} // end of addVertex()
 
 	public void addEdge(String srcLabel, String tarLabel, int weight) 
@@ -61,8 +61,19 @@ public class IncidenceMatrix extends AbstractAssocGraph {
 			{
 				edgeK.put(addingEdge, numOfEdges);
 				numOfEdges++;
-				
-				matrix = new int[numOfVertex][numOfEdges];
+
+					int[][] temp = new int[numOfVertex][numOfEdges];
+
+					for(int i = 0; i < numOfVertex; i++) 
+					{
+						for(int j = 0; j < numOfEdges; j++) 
+						{
+							
+							temp[i][j]= matrix[i][j];
+						}
+					}
+					matrix = temp;
+
 
 				matrix[vertexK.get(srcLabel)][edgeK.get(addingEdge)] = weight;
 				matrix[vertexK.get(tarLabel)][edgeK.get(addingEdge)] = -weight;
@@ -86,21 +97,21 @@ public class IncidenceMatrix extends AbstractAssocGraph {
 		boolean check = false;
 		String checkEdge = srcLabel + tarLabel;
 
-			if(vertexK.containsKey(srcLabel))
+		if(vertexK.containsKey(srcLabel))
+		{
+			if(vertexK.containsKey(tarLabel))
 			{
-				if(vertexK.containsKey(tarLabel))
-				{
-					check = true;
-				}
+				check = true;
 			}
-			
-			if (check == true)
+		}
+
+		if (check == true)
+		{
+			if (edgeK.containsKey(checkEdge))
 			{
-				if (edgeK.containsKey(checkEdge))
-				{
-					return matrix[vertexK.get(srcLabel)][edgeK.get(checkEdge)];
-				}
+				return matrix[vertexK.get(srcLabel)][edgeK.get(checkEdge)];
 			}
+		}
 
 		// update return value
 		return EDGE_NOT_EXIST;
@@ -117,52 +128,54 @@ public class IncidenceMatrix extends AbstractAssocGraph {
 		boolean check = false;
 		String checkEdge = srcLabel + tarLabel;
 
-			if(vertexK.containsKey(srcLabel))
+		if(vertexK.containsKey(srcLabel))
+		{
+			if(vertexK.containsKey(tarLabel))
 			{
-				if(vertexK.containsKey(tarLabel))
-				{
-					check = true;
-				}
+				check = true;
 			}
-		
-			if(check == true)
+		}
+
+		if(check == true)
+		{
+			if (edgeK.containsKey(checkEdge) && weight >= 0)
 			{
-				if (edgeK.containsKey(checkEdge) && weight >= 0)
-				{
-					matrix[vertexK.get(srcLabel)][edgeK.get(checkEdge)] = weight;
-					matrix[vertexK.get(tarLabel)][edgeK.get(checkEdge)] = -weight;
-				}
-				else
-				{
-					System.err.println("Warning: Weight is less than or equal to 0.");
-				}
+				matrix[vertexK.get(srcLabel)][edgeK.get(checkEdge)] = weight;
+				matrix[vertexK.get(tarLabel)][edgeK.get(checkEdge)] = -weight;
 			}
-		
+			else
+			{
+				System.err.println("Warning: Weight is less than or equal to 0.");
+			}
+		}
+
 	} // end of updateWeightEdge()
 
 	public void removeVertex(String vertLabel) 
 	{
+		/*
+		 *  1 -- REPAINT THE MATRIX FROM THE OLD MATRIX!
+		 *  2 -- REMOVE EDGES RELATED TO VERTEX FIRST FROM THE EDGE MAP!,
+		 * 	3 -- THEN REMOVE VERTEX FROM THE VERTEX MAP!
+		 */
+
+		/* Repaint the array */
 		for(Map.Entry<String, Integer> e: edgeK.entrySet())
 		{
 			String edger = e.getKey();
 			String pointA = edger.substring(0, 1);
 			String pointB = edger.substring(1, 2);
-			
-			if(pointA.equalsIgnoreCase(vertLabel) || pointB.equalsIgnoreCase(vertLabel))
+
+			if(!pointA.equalsIgnoreCase(vertLabel) || !pointB.equalsIgnoreCase(vertLabel))
 			{
-				matrix[vertexK.get(vertLabel)][edgeK.get(edger)] = 0;
+				matrix[vertexK.get(pointA)][edgeK.get(edger)] = 0;
 			}
 		}
-		/*
-		 *  1 -- REMOVE EDGES RELATED TO VERTEX FIRST FROM THE MAP!,
-		 * 	2 -- THEN REMOVE VERTEX FROM THE MAP!
-		 * 	3 -- REPAINT THE MATRIX FROM THE MATRIX!
-		 */
 
 		/* creating a string array */
 		String[] arry = new String[numOfEdges];
 		int count = 0;
-		/* 1 -- REMOVING THE EDGES FROM THE MAP! */
+		/* 2 -- REMOVING THE EDGES FROM THE MAP! */
 		for(Map.Entry<String, Integer> e: edgeK.entrySet())
 		{
 			String edger = e.getKey();
@@ -195,7 +208,7 @@ public class IncidenceMatrix extends AbstractAssocGraph {
 			e.setValue(numOfEdges);
 			numOfEdges++;
 		}
-	/* 2 -- REMOVING THE VERTEX FROM THE MAP! */
+		/* 2 -- REMOVING THE VERTEX FROM THE MAP! */
 		/*
 		 * reset numOfVertex
 		 * create temporary map for new order of vertices 
@@ -209,15 +222,7 @@ public class IncidenceMatrix extends AbstractAssocGraph {
 			e.setValue(numOfVertex);
 			numOfVertex++;
 		}
-		
-		/* 3 -- Repaint the matrix */
-		matrix = new int[numOfVertex][numOfEdges];
-		
-		
-		
-		
-		
-		
+
 	} // end of removeVertex()
 
 	public List<MyPair> inNearestNeighbours(int k, String vertLabel) 
@@ -225,7 +230,7 @@ public class IncidenceMatrix extends AbstractAssocGraph {
 		List<MyPair> neighbours = new ArrayList<MyPair>();
 		List<MyPair> temp = new ArrayList<MyPair>();
 		int count = 0;
-		
+
 		if(k == -1)
 		{
 			/*	AIM: to get the target labels
@@ -238,7 +243,7 @@ public class IncidenceMatrix extends AbstractAssocGraph {
 				String getEdge = e.getKey();
 				String pointA = getEdge.substring(0, 1);
 				String pointB = getEdge.substring(1, 2);
-				
+
 				if(pointA.equalsIgnoreCase(vertLabel))
 				{
 					neighbours.add(new MyPair(pointB, matrix[vertexK.get(pointA)][edgeK.get(getEdge)]));
@@ -252,14 +257,14 @@ public class IncidenceMatrix extends AbstractAssocGraph {
 				String getEdge = e.getKey();
 				String pointA = getEdge.substring(0, 1);
 				String pointB = getEdge.substring(1, 2);
-				
+
 				if(pointA.equalsIgnoreCase(vertLabel))
 				{
 					temp.add(new MyPair(pointB, matrix[vertexK.get(pointA)][edgeK.get(getEdge)]));
 					count++;
 				}
 			}
-			
+
 			for (int i = 0; i < count; i++)
 			{
 				for (int j = 0; j < count - 1; j++)
@@ -295,13 +300,12 @@ public class IncidenceMatrix extends AbstractAssocGraph {
 		List<MyPair> neighbours = new ArrayList<MyPair>();
 		List<MyPair> temp = new ArrayList<MyPair>();
 		int count = 0;
-		
+
 		if(k == -1)
 		{
 			/*	AIM: to get the target labels
 			 * get the substrings
 			 * if target = a, we get the source
-			 * hehe xd
 			 */
 
 			for(Map.Entry<String, Integer> e: edgeK.entrySet())
@@ -309,7 +313,7 @@ public class IncidenceMatrix extends AbstractAssocGraph {
 				String getEdge = e.getKey();
 				String pointA = getEdge.substring(0, 1);
 				String pointB = getEdge.substring(1, 2);
-				
+
 				if(pointB.equalsIgnoreCase(vertLabel))
 				{
 					neighbours.add(new MyPair(pointA, matrix[vertexK.get(pointA)][edgeK.get(getEdge)]));
@@ -323,14 +327,14 @@ public class IncidenceMatrix extends AbstractAssocGraph {
 				String getEdge = e.getKey();
 				String pointB = getEdge.substring(0, 1);
 				String pointA = getEdge.substring(1, 2);
-				
+
 				if(pointB.equalsIgnoreCase(vertLabel))
 				{
 					temp.add(new MyPair(pointA, matrix[vertexK.get(pointA)][edgeK.get(getEdge)]));
 					count++;
 				}
 			}
-			
+
 			for (int i = 0; i < count; i++)
 			{
 				for (int j = 0; j < count - 1; j++)
@@ -380,10 +384,10 @@ public class IncidenceMatrix extends AbstractAssocGraph {
 			String pointA = edgs.substring(0, 1);
 			String pointB = edgs.substring(1, 2);
 			int w = matrix[vertexK.get(pointA)][edgeK.get(edgs)];
-			
+
 			os.println(pointA + " " + pointB + " " + w);
 		}
-		
+
 		os.println();
 	} // end of printEdges()
 
